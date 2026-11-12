@@ -23,13 +23,20 @@ live-data/
 
 # Hub API: the database is built from hub/data/reference/seed/ (first request or image build).
 # The seed is processed Deutsche Börse data: it must not be published (this repo is public).
-# scripts/sync-hub.sh copies it locally; copy it to the server by hand (scp/rsync), never via git.
+# Get it from a teammate or build it from the raw ZIP (hub/scripts/build.sh); to the server by scp/rsync, never via git.
 hub/data/reference/seed/
+# real API responses and raw values used by the tests, and the dataset notes: same data, local only
+hub/tests/fixtures/
+hub/docs/data_dictionary.md
 # events.csv holds tagesschau.de headlines, which may not be republished; the API reads events from the seed.
 hub/data/reference/events.csv
 hub/data/hub.duckdb*
 hub/data/*.seeding
 hub/.env
+hub/.venv/
+# Raw Deutsche Börse files and cached event-source responses (pipeline input, never published)
+hub/data/raw/
+hub/data/raw_events/
 
 # Python
 __pycache__/

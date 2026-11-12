@@ -1,7 +1,8 @@
 # IssuerLens: Hub API + frontend.
 #   docker compose up --build        -> http://localhost:8080   (alert mails: http://localhost:8025)
-# Public HTTPS: add -f docker-compose.yml -f docker-compose.https.yml (see README).
-# Hub API code and data come from hub/ (scripts/sync-hub.sh copies them from the team repo).
+# Public server: add -f docker-compose.http.yml (plain HTTP on port 80), -f docker-compose.https.yml (Caddy)
+# or -f docker-compose.tunnel.yml (Cloudflare); scripts/server-setup.sh picks one (see README).
+# Hub API code, config and Parquet seed live in hub/; the seed is not in git (copy it, see README).
 name: issuer-hub
 
 services:
@@ -57,6 +58,10 @@ services:
     build:
       context: .
       dockerfile: docker/frontend.Dockerfile
+    environment:
+      # optional site password (docker/40-basic-auth.sh); empty = open, fine on localhost
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-}
+      BASIC_AUTH_PASSWORD: ${BASIC_AUTH_PASSWORD:-}
     ports:
       - "8080:80"
     depends_on:

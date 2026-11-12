@@ -1,5 +1,5 @@
-# Hub API (FastAPI) from hub/ (copied from the team repo by scripts/sync-hub.sh).
-# Dependencies are the exact versions of the team repo's uv.lock (exported to hub-api.requirements.txt),
+# Hub API (FastAPI) from hub/.
+# Dependencies are the exact versions of hub/uv.lock (exported to hub-api.requirements.txt),
 # so DuckDB matches the version that wrote the seed.
 FROM python:3.13.5-slim
 

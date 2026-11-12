@@ -9,3 +9,7 @@ frontend/dist
 live-data
 hub/data/hub.duckdb*
 hub/.env
+hub/.venv
+hub/data/raw
+hub/data/raw_events
+hub/tests

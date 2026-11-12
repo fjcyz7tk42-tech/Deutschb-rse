@@ -1,0 +1,34 @@
+# Public deployment through a Cloudflare Tunnel: no public IP, no open ports, Cloudflare provides HTTPS.
+#   docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up --build -d
+# Needs TUNNEL_TOKEN in .env (Cloudflare Zero Trust -> Networks -> Tunnels) and, in that tunnel,
+# a public hostname APP_DOMAIN -> HTTP frontend:80. Requires Docker Compose 2.24.4+ for !reset.
+# Use this instead of docker-compose.https.yml, not together with it.
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.0
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env (see .env.example)}
+    depends_on:
+      frontend:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    ports: !reset []
+
+  hub-api:
+    ports: !reset []
+    environment:
+      # Only reachable inside Docker; trust nginx's forwarded HTTPS headers.
+      FORWARDED_ALLOW_IPS: "*"
+
+  live:
+    ports: !reset []
+    environment:
+      FORWARDED_ALLOW_IPS: "*"
+      # Mail links point at the public address, even if .env still has the local PUBLIC_URL.
+      PUBLIC_URL: https://${APP_DOMAIN:-www.justklaris.com}
+
+  mailpit:
+    ports: !reset []

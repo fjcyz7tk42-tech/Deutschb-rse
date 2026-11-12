@@ -1,4 +1,4 @@
-// Typed client for the team's Hub API (contract: futury_4_2026/docs/api_contract.md).
+// Typed client for the Hub API (contract: hub/docs/api_contract.md).
 // Every number shown in this app comes from these responses; the frontend never computes figures
 // that the API does not deliver, it only formats them.
 import axios from 'axios';

@@ -1,0 +1,23 @@
+# Public HTTP on port 80, no domain and no certificate (e.g. the JAIF build-days server, whose port 41080
+# forwards to port 80 of the VM):
+#   docker compose -f docker-compose.yml -f docker-compose.http.yml up --build -d
+# Only the frontend is public. Both APIs and Mailpit listen on 127.0.0.1 only; reach Mailpit through SSH:
+#   ssh -p <ssh-port> -L 8025:localhost:8025 <user>@<server>   ->  http://localhost:8025
+# Set PUBLIC_URL (address in the mail links) and BASIC_AUTH_USER/BASIC_AUTH_PASSWORD in .env.
+# Requires Docker Compose 2.24.4+ for !override.
+services:
+  frontend:
+    ports: !override
+      - "80:80"
+
+  hub-api:
+    ports: !override
+      - "127.0.0.1:8001:8000"
+
+  live:
+    ports: !override
+      - "127.0.0.1:8003:8000"
+
+  mailpit:
+    ports: !override
+      - "127.0.0.1:8025:8025"
