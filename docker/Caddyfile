@@ -1,0 +1,7 @@
+{$APP_DOMAIN} {
+	tls {
+		ca https://acme-v02.api.letsencrypt.org/directory
+	}
+	encode zstd gzip
+	reverse_proxy frontend:80
+}

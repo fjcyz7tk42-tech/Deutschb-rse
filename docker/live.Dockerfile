@@ -1,5 +1,5 @@
 # Live feed service (live/ in this repo). Reuses the team fetcher's EQS categories, title rules and the
-# tagesschau name list, so the team repo is passed in as the build context "hub" like for the Hub API.
+# tagesschau name list from hub/backend.
 FROM python:3.13.5-slim
 
 ENV PYTHONUNBUFFERED=1 \
@@ -13,7 +13,7 @@ WORKDIR /app
 COPY docker/hub-api.requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-COPY --from=hub backend /app/backend
+COPY hub/backend /app/backend
 COPY live /app/live
 
 RUN useradd --system --uid 10001 hub && mkdir -p /app/live-data && chown -R hub /app

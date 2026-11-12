@@ -3,3 +3,9 @@
 frontend/dist
 **/*.tsbuildinfo
 .env
+**/__pycache__
+**/*.pyc
+.venv
+live-data
+hub/data/hub.duckdb*
+hub/.env

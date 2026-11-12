@@ -2,7 +2,7 @@
 
     uvicorn live.app:app --port 8003
 
-Needs the team repo on PYTHONPATH (backend.fetcher: EQS categories, title rules, tagesschau name list).
+Needs hub/ on PYTHONPATH (backend.fetcher: EQS categories, title rules, tagesschau name list).
 Environment:
     HUB_API_URL           Hub API for the company list   (default http://127.0.0.1:8000)
     LIVE_DATA_DIR         SQLite file and raw responses   (default ./live-data)

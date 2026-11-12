@@ -1,6 +1,6 @@
-# Hub API (FastAPI) from the team repo futury_4_2026, passed in as the build context "hub".
-# Dependencies are the exact versions of futury_4_2026/uv.lock (exported to hub-api.requirements.txt),
-# so DuckDB matches the version that wrote data/hub.duckdb.
+# Hub API (FastAPI) from hub/ (copied from the team repo by scripts/sync-hub.sh).
+# Dependencies are the exact versions of the team repo's uv.lock (exported to hub-api.requirements.txt),
+# so DuckDB matches the version that wrote the seed.
 FROM python:3.13.5-slim
 
 ENV PYTHONUNBUFFERED=1 \
@@ -13,8 +13,11 @@ WORKDIR /app
 COPY docker/hub-api.requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-# Code only. data/ (database, reference CSVs) and config.yaml are mounted read-only at runtime.
-COPY --from=hub backend /app/backend
+COPY hub/config.yaml /app/config.yaml
+COPY hub/data/reference /app/data/reference
+COPY hub/backend /app/backend
+# Build data/hub.duckdb from the Parquet seed now, so the container starts with a finished database.
+RUN python -m backend.seed load
 
 RUN useradd --system --uid 10001 hub && chown -R hub /app
 USER hub

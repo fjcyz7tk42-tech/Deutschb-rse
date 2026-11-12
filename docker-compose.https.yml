@@ -1,0 +1,42 @@
+# Public deployment: docker compose -f docker-compose.yml -f docker-compose.https.yml up --build -d
+# Requires Docker Compose 2.24.4+ for !reset. Plain `docker compose up` stays local.
+services:
+  caddy:
+    image: caddy:2.11.9-alpine
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-www.justklaris.com}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      frontend:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    ports: !reset []
+
+  hub-api:
+    ports: !reset []
+    environment:
+      # Only reachable inside Docker; trust nginx's forwarded HTTPS headers.
+      FORWARDED_ALLOW_IPS: "*"
+
+  live:
+    ports: !reset []
+    environment:
+      FORWARDED_ALLOW_IPS: "*"
+      # Override even a local PUBLIC_URL in .env so mail links match Caddy's host.
+      PUBLIC_URL: https://${APP_DOMAIN:-www.justklaris.com}
+
+  mailpit:
+    ports: !reset []
+
+volumes:
+  caddy-data:
+  caddy-config:

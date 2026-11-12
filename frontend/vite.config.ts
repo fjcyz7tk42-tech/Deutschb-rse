@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// The data comes from the team's Hub API (futury_4_2026, `uvicorn backend.api:app`).
+// The data comes from the Hub API (hub/, `uvicorn backend.api:app`).
 // The dev server forwards /api/* to it, so the browser never talks to the API directly.
 const API_TARGET = process.env.HUB_API || 'http://127.0.0.1:8000'
 // Live feed service (live/app.py in this repo): /live/* -> the service.

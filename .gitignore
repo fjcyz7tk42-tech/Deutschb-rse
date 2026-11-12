@@ -21,6 +21,16 @@ logs/
 Thumbs.db
 live-data/
 
+# Hub API: the database is built from hub/data/reference/seed/ (first request or image build).
+# The seed is processed Deutsche Börse data: it must not be published (this repo is public).
+# scripts/sync-hub.sh copies it locally; copy it to the server by hand (scp/rsync), never via git.
+hub/data/reference/seed/
+# events.csv holds tagesschau.de headlines, which may not be republished; the API reads events from the seed.
+hub/data/reference/events.csv
+hub/data/hub.duckdb*
+hub/data/*.seeding
+hub/.env
+
 # Python
 __pycache__/
 *.py[cod]

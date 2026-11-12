@@ -1,0 +1,37 @@
+# Starting values from the build guide. Tune on the focus stocks.
+focus_stocks: [CBK, DWS, PBB]
+baseline_window_days: 20
+z_threshold: 3
+market_day_threshold:   # share of an index's members anomalous on the same day
+  DAX: 0.30
+  MDAX: 0.30
+  SDAX: 0.20   # SDAX peaks at 0.31 in 2026; 0.30 sits at the edge (docs/data_dictionary.md)
+order_size_eur: 25000
+timezone: Europe/Berlin
+close_cutoff_local: "17:35"
+# Share of a sector's members (DAX, MDAX and SDAX together) with unusual turnover on the same day, and the
+# minimum number of such stocks. Base rate: about 7 % of stock days are unusual. Added 12 Nov.
+sector_day_threshold:
+  share: 0.25
+  min_stocks: 3
+# Trading days searched around an episode's peak day, per event type. [before, after]
+# Forward windows for late-published disclosures are a proposal, not in the build guide.
+event_match_window:
+  default: [-3, 2]   # widened 12 Nov for the demo (was [-1, 1]); the card shows the event's own trading day
+  voting_rights: [0, 5]
+  directors_dealing: [0, 5]
+  short_position: [0, 0]   # Bundesanzeiger position date = the trading day itself (published the next day)
+# DeepSeek, OpenAI-compatible chat completions. Model names changed during 2026:
+# confirm both at https://api-docs.deepseek.com before the first call.
+llm:
+  base_url: https://api.deepseek.com
+  classify_model: deepseek-flash
+  text_model: deepseek-flash   # non-reasoning: the card must be ready in under 10 s; v4-pro timed out at 8 s
+# Alerts (focus stocks). Priority comes from the episode score (triage.py): HIGH from high, MED from medium, LOW below.
+# An event without an unusual day is MED for the listed types, otherwise LOW.
+alerts:
+  high: 70
+  medium: 40
+  medium_event_types: [earnings, ad_hoc, m_and_a]
+  list_from: "2026-10-01"      # alerts older than this are not listed
+  replay_from: "2026-10-23"    # demo replay: the app starts as of this day; later days arrive with "Load new trading day"

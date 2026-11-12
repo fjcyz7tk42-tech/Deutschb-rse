@@ -1,6 +1,7 @@
 # IssuerLens: Hub API + frontend.
 #   docker compose up --build        -> http://localhost:8080   (alert mails: http://localhost:8025)
-# The team repo futury_4_2026 is expected next to this one; another location: HUB_DIR=/path docker compose up
+# Public HTTPS: add -f docker-compose.yml -f docker-compose.https.yml (see README).
+# Hub API code and data come from hub/ (scripts/sync-hub.sh copies them from the team repo).
 name: issuer-hub
 
 services:
@@ -8,18 +9,10 @@ services:
     build:
       context: .
       dockerfile: docker/hub-api.Dockerfile
-      additional_contexts:
-        hub: ${HUB_DIR:-../futury_4_2026}
-    env_file:
-      # DEEPSEEK_API_KEY for the AI summary on the impact card; without it the card has no summary text
-      - path: ${HUB_DIR:-../futury_4_2026}/.env
-        required: false
     environment:
       DB_PATH: data/hub.duckdb
-    volumes:
-      # database and reference CSVs, read-only: the API never writes
-      - ${HUB_DIR:-../futury_4_2026}/data:/app/data:ro
-      - ${HUB_DIR:-../futury_4_2026}/config.yaml:/app/config.yaml:ro
+      # AI summary on the impact card, from .env; without it the card shows the template text
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     ports:
       - "8001:8000"   # direct API access (docs: http://localhost:8001/docs)
     restart: unless-stopped
@@ -29,8 +22,6 @@ services:
     build:
       context: .
       dockerfile: docker/live.Dockerfile
-      additional_contexts:
-        hub: ${HUB_DIR:-../futury_4_2026}
     environment:
       HUB_API_URL: http://hub-api:8000
       EQS_INTERVAL_S: "120"
