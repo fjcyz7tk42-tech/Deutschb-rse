@@ -2,7 +2,9 @@
 .app { min-height: 100vh; }
 .page-width { width: min(1480px, calc(100% - 64px)); margin-inline: auto; }
 .app-header { display: flex; align-items: center; gap: 40px; min-height: 104px; padding-block: 22px; }
-.brand { display: flex; flex-direction: column; color: var(--heading); text-decoration: none; font-size: 29px; font-weight: 700; line-height: 1.15; letter-spacing: -.8px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--heading); text-decoration: none; font-size: 29px; font-weight: 700; line-height: 1.15; letter-spacing: -.8px; }
+.brand-mark { display: block; width: 34px; height: auto; flex: none; }
+.brand-copy { display: flex; flex-direction: column; }
 .brand span { margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: .1px; }
 .app-header .stock-selector { margin-left: auto; }
 .workspace { padding-bottom: 20px; }
@@ -341,6 +343,7 @@ select, .selector-search { background: white; border: 1px solid #b9c3d3; border-
   .page-width { width: calc(100% - 28px); }
   .app-header { min-height: 0; padding-block: 18px; gap: 18px 12px; }
   .brand { font-size: 26px; }
+  .brand-mark { width: 28px; }
   .brand span { font-size: 10px; }
   .app-header .stock-selector { order: 3; width: 100%; }
   .export-snapshot { font-size: 11px; padding: 8px 10px; }

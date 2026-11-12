@@ -18,6 +18,7 @@ import {
   AUCTION_METRICS, COMPARE_TYPES, FACT_LABELS, TIMING_TYPES, METRICS, ORDER_SIZES, factCaption, fmtBaseline, fmtDate, fmtEur, fmtFact,
 } from './format';
 import './App.css';
+import issuerLensMark from './assets/issuerlens-mark.svg';
 
 export default function App() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -234,7 +235,10 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header page-width">
-        <a className="brand" href="#" onClick={(e) => { e.preventDefault(); navigate('overview'); }}>IssuerLens<span>Issuer Intelligence Hub</span></a>
+        <a className="brand" href="#" onClick={(e) => { e.preventDefault(); navigate('overview'); }}>
+          <img className="brand-mark" src={issuerLensMark} width="34" height="32" alt="" />
+          <div className="brand-copy">IssuerLens<span>Issuer Intelligence Hub</span></div>
+        </a>
         <StockSelector companies={companies} selected={company} onSelect={selectCompany} />
         <button className="btn export-snapshot" disabled={!company || impactLoading} onClick={() => setReportOpen(true)}>Export IR snapshot <span aria-hidden>↗</span></button>
       </header>
