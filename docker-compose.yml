@@ -1,0 +1,79 @@
+# IssuerLens: Hub API + frontend.
+#   docker compose up --build        -> http://localhost:8080   (alert mails: http://localhost:8025)
+# The team repo futury_4_2026 is expected next to this one; another location: HUB_DIR=/path docker compose up
+name: issuer-hub
+
+services:
+  hub-api:
+    build:
+      context: .
+      dockerfile: docker/hub-api.Dockerfile
+      additional_contexts:
+        hub: ${HUB_DIR:-../futury_4_2026}
+    env_file:
+      # DEEPSEEK_API_KEY for the AI summary on the impact card; without it the card has no summary text
+      - path: ${HUB_DIR:-../futury_4_2026}/.env
+        required: false
+    environment:
+      DB_PATH: data/hub.duckdb
+    volumes:
+      # database and reference CSVs, read-only: the API never writes
+      - ${HUB_DIR:-../futury_4_2026}/data:/app/data:ro
+      - ${HUB_DIR:-../futury_4_2026}/config.yaml:/app/config.yaml:ro
+    ports:
+      - "8001:8000"   # direct API access (docs: http://localhost:8001/docs)
+    restart: unless-stopped
+
+  live:
+    # polls EQS News (every 2 min) and tagesschau.de business news (every 5 min); run only ONE poller
+    build:
+      context: .
+      dockerfile: docker/live.Dockerfile
+      additional_contexts:
+        hub: ${HUB_DIR:-../futury_4_2026}
+    environment:
+      HUB_API_URL: http://hub-api:8000
+      EQS_INTERVAL_S: "120"
+      TAGESSCHAU_INTERVAL_S: "300"
+      # mail alerts: by default into Mailpit (nothing leaves the machine); real SMTP via .env, see .env.example
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURITY: ${SMTP_SECURITY:-none}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-alerts@issuer-hub.local}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+      ALERT_MAX_AGE_H: ${ALERT_MAX_AGE_H:-6}
+    volumes:
+      - live-data:/app/live-data   # SQLite feed database and raw responses
+    ports:
+      - "8003:8000"   # also used by the local dev frontend (npm run dev)
+    depends_on:
+      hub-api:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    restart: unless-stopped
+
+  mailpit:
+    # catches the alert mails for the demo and shows them in a web UI; unused once SMTP_HOST points elsewhere
+    image: axllent/mailpit:v1.21.8
+    ports:
+      - "8025:8025"   # web UI
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      hub-api:
+        condition: service_healthy
+      live:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  live-data:

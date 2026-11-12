@@ -1,12 +1,51 @@
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Exchange-inspired surfaces and controls; IssuerLens retains its own identity. */
+  --bg: #f1f4fb;
+  --panel: #ffffff;
+  --panel-2: #f6f8fc;
+  --border: #d7dde6;
+  --text: #303b4b;
+  --heading: #000069;
+  --muted: #536071;
+  --faint: #657183;
+  --accent: #00e88b;
+  --accent-soft: #e2f9ef;
+  --blue: #00008c;
+  --line: #4038ff;
+  --bar: #a6b8d3;
+  --bar-up: #73cbb2;
+  --bar-down: #ed9b96;
+  --matched: #008754;
+  --market: #5551c8;
+  --unmatched: #a66a09;
+  --event: #657183;
+  --up: #007c4c;
+  --down: #c63832;
+
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 14px;
   line-height: 1.5;
-  font-weight: 400;
-  color: #e0e0e0;
-  background-color: #0f1117;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   min-width: 320px;
+  background: var(--bg);
 }
+
+button, select, input { font: inherit; color: inherit; }
+button, select, input[type='checkbox'] { touch-action: manipulation; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--line); outline-offset: 3px;
+}
+input[type='checkbox'] { accent-color: var(--blue); }
+a { color: var(--blue); text-underline-offset: 3px; }
+h1, h2, h3, h4 { color: var(--heading); line-height: 1.25; }
+::selection { background: var(--accent-soft); color: var(--heading); }

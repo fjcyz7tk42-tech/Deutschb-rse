@@ -1,54 +1,28 @@
-# Environment variables (contains API keys)
+# Environment
 .env
 
-# Database (issuerlens.db.gz included in repo for quick start)
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
-*.db.backup
-
-# ML models (models.tar.gz included in repo for quick start)
-*.joblib
-*.pkl
-*.pickle
-backend/ml/models/
-
-# Raw data
-data/
-
-# Stock images (too large for git)
-backend/static/images/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.egg-info/
-dist/
-build/
-*.egg
-.venv/
-venv/
-env/
-
-# Node / Frontend
+# Node / frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+*.tsbuildinfo
 
 # Logs
 logs/
 *.log
 
-# IDE
+# IDE / OS
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
-
-# OS
 Thumbs.db
+live-data/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
