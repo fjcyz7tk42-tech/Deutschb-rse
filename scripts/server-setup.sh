@@ -2,7 +2,7 @@
 # Prepares a Linux server (e.g. the JAIF build-days machine) and starts the public stack.
 #
 #   On the server (web terminal is fine):
-#     bash <(curl -fsSL https://raw.githubusercontent.com/fjcyz7tk42-tech/Deutschb-rse/issuer-intelligence-hub/scripts/server-setup.sh)
+#     bash <(curl -fsSL https://raw.githubusercontent.com/fjcyz7tk42-tech/Deutscheboerse_track_futury_4/issuer-intelligence-hub/scripts/server-setup.sh)
 #   or from an existing clone:
 #     bash scripts/server-setup.sh
 #
@@ -15,7 +15,7 @@
 # The Parquet seed is not in git; copy it first (see the message the script prints).
 set -euo pipefail
 
-REPO_URL="${REPO_URL:-https://github.com/fjcyz7tk42-tech/Deutschb-rse.git}"
+REPO_URL="${REPO_URL:-https://github.com/fjcyz7tk42-tech/Deutscheboerse_track_futury_4.git}"
 BRANCH="${BRANCH:-issuer-intelligence-hub}"
 # /srv is the large data disk on the JAIF machines; the home directory sits on the small system disk
 if [ -z "${APP_DIR:-}" ]; then

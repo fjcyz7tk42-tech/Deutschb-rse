@@ -272,7 +272,7 @@ On a Linux server, [`scripts/server-setup.sh`](scripts/server-setup.sh) does all
 # 1. on the laptop: copy the seed (not in git) to the server
 rsync -az -e "ssh -p <ssh-port>" hub/data/reference/seed/ <user>@<server>:/srv/issuer-hub/hub/data/reference/seed/
 # 2. on the server
-bash <(curl -fsSL https://raw.githubusercontent.com/fjcyz7tk42-tech/Deutschb-rse/issuer-intelligence-hub/scripts/server-setup.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/fjcyz7tk42-tech/Deutscheboerse_track_futury_4/issuer-intelligence-hub/scripts/server-setup.sh)
 ```
 
 If `rsync` cannot create `/srv/issuer-hub` (owned by root), run `sudo mkdir -p /srv/issuer-hub && sudo chown $USER /srv/issuer-hub` on the server first.
