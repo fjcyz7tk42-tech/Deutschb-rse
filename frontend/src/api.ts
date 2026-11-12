@@ -154,6 +154,40 @@ export const getSeries = (isin: string, metric: string, orderSize?: number) =>
 export const getTrend = (isin: string) =>
   http.get<{ isin: string; facts: Fact[] }>(`/companies/${isin}/trend`).then((r) => r.data.facts);
 
+export interface PulseMetric {
+  key: 'xlm_bps' | 'turnover_eur';
+  label: string;
+  unit: string;
+  value: number | null;
+  baseline: number | null;
+  change_pct: number | null;
+  index_median_change_pct: number | null;
+  direction: 'better' | 'worse' | 'steady' | null;
+  context: string | null;
+  source: string;
+}
+
+// Liquidity Pulse: spread (XLM) and turnover, last 20 trading days vs the 60 before, against the index median.
+export interface Pulse {
+  isin: string;
+  status: 'found' | 'not_found';
+  reason?: string;
+  state?: 'stronger' | 'weaker' | 'mixed' | 'steady';
+  label?: string;
+  context?: 'market-wide' | 'stock-specific' | 'partly market-wide' | null;
+  gap_pp?: number | null;
+  index?: string;
+  index_members?: number;
+  date?: string;
+  window?: string;
+  metrics?: PulseMetric[];
+  text?: string;
+  rule: string;
+  source?: string;
+}
+
+export const getPulse = (isin: string) => http.get<Pulse>(`/companies/${isin}/pulse`).then((r) => r.data);
+
 export const getPeers = (isin: string, basis: string, metric: string, start?: string, end?: string) =>
   http.get<Peers>(`/companies/${isin}/peers`, { params: { basis, metric, start, end } }).then((r) => r.data);
 

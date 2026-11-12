@@ -1,7 +1,7 @@
 // Shareable IR snapshot. Opens as a preview; "Print / Save as PDF" uses the browser's print dialog,
 // and the print stylesheet shows only this report.
 import { useEffect, useRef, useState } from 'react';
-import { getPeers, type Cases, type Company, type Fact, type Impact, type Peers } from '../api';
+import { getPeers, type Cases, type Company, type Fact, type Impact, type Peers, type Pulse } from '../api';
 import {
   FACT_LABELS, MATCH_WINDOW_TEXT, STATUS_LABELS, eventTitle, eventTypeLabel, summaryText, fmtBaseline, fmtBerlin, fmtDate, fmtFact, fmtValue, sourceLabel,
 } from '../format';
@@ -9,6 +9,7 @@ import {
 interface Props {
   company: Company;
   trend: Fact[];
+  pulse: Pulse | null;
   cases: Cases | null;
   impact: Impact | null;
   onClose: () => void;
@@ -17,7 +18,7 @@ interface Props {
 const PEER_METRICS = ['turnover_eur', 'xlm_bps', 'auction_share'];
 const PEER_LABELS: Record<string, string> = { turnover_eur: 'Turnover per day', xlm_bps: 'Spread (XLM, EUR 25k)', auction_share: 'Auction share' };
 
-export default function ReportView({ company, trend, cases, impact, onClose }: Props) {
+export default function ReportView({ company, trend, pulse, cases, impact, onClose }: Props) {
   const [peers, setPeers] = useState<Peers[]>([]);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +85,14 @@ export default function ReportView({ company, trend, cases, impact, onClose }: P
             </p>
             {impact.text && <p className="r-text">{summaryText(impact.text, impact.event)}</p>}
             <FactTable facts={impact.facts} />
+          </section>
+        )}
+
+        {pulse?.status === 'found' && pulse.text && (
+          <section>
+            <h2>Liquidity Pulse: {pulse.label}{pulse.context ? ` (${pulse.context})` : ''}</h2>
+            <p className="r-text">{pulse.text}</p>
+            <p className="r-note">{pulse.rule}</p>
           </section>
         )}
 

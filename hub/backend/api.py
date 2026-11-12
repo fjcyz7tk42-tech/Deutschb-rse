@@ -129,6 +129,104 @@ def trend(isin: str):
     return {"isin": isin, "facts": out}
 
 
+# ---------------------------------------------------------------- Liquidity Pulse
+PULSE_STEP = 0.10  # a change smaller than ±10 % counts as steady
+PULSE_GAP = 0.10   # stock change within 10 percentage points of its index median: market-wide
+PULSE_RULE = ("Median of the last 20 trading days vs the 60 before. Spread (XLM) and turnover each count as changed from ±10 %. "
+              "Stronger: spread down or turnover up, and nothing the other way. Weaker: spread up or turnover down, and nothing the "
+              "other way. Mixed: one better, one worse. Steady: both within ±10 %. Market-wide: the stock's change is within "
+              "10 percentage points of its index median; otherwise stock-specific.")
+PULSE_HEAD = {"stronger": "Stronger", "weaker": "Weaker", "mixed": "Mixed", "steady": "Steady"}
+
+
+def pulse_direction(change: float | None, lower_is_better: bool) -> int | None:
+    """+1 better, -1 worse, 0 steady (within ±10 %), None without data. A lower spread is better, a higher turnover is better."""
+    if change is None:
+        return None
+    if abs(change) < PULSE_STEP:
+        return 0
+    return 1 if (change < 0) == lower_is_better else -1
+
+
+def pulse_state(spread_change: float | None, turnover_change: float | None) -> str | None:
+    """stronger / weaker / mixed / steady. None without spread data: the spread is the measure of trading cost."""
+    s = pulse_direction(spread_change, True)
+    if s is None:
+        return None
+    dirs = {s, pulse_direction(turnover_change, False)}
+    better, worse = 1 in dirs, -1 in dirs
+    return "mixed" if better and worse else "stronger" if better else "weaker" if worse else "steady"
+
+
+def pulse_context(moves: list[tuple[float, float | None]]) -> str | None:
+    """moves: (stock change, index median change) of the measures that changed. Market-wide, stock-specific or partly market-wide."""
+    flags = [abs(c - m) < PULSE_GAP for c, m in moves if m is not None]
+    if not flags:
+        return None
+    return "market-wide" if all(flags) else "stock-specific" if not any(flags) else "partly market-wide"
+
+
+def _change(recent, before):
+    return None if recent is None or not before else recent / before - 1
+
+
+def _pct(v):
+    return None if v is None else round(v * 100, 1)
+
+
+@app.get("/companies/{isin}/pulse")
+def pulse(isin: str):
+    """Liquidity Pulse: has trading the stock become cheaper or dearer? Spread (XLM) and turnover, last 20 trading days vs the
+    60 before, set against the median change of the stock's index. Describes what happened; no forecast."""
+    e = entity_or_404(isin)
+    order = int(load_config()["order_size_eur"])
+    rows = q("""WITH d AS (SELECT d.isin, d.date, d.turnover_eur, d.xlm_bps,
+                       row_number() OVER (PARTITION BY d.isin ORDER BY d.date DESC) AS k
+                FROM daily_metrics d JOIN entities en USING (isin) WHERE en.idx = ?)
+                SELECT isin, max(date) FILTER (k = 1) AS last, min(date) FILTER (k = 80) AS first,
+                       median(xlm_bps) FILTER (k <= 20) AS x_recent, median(xlm_bps) FILTER (k BETWEEN 21 AND 80) AS x_before,
+                       median(turnover_eur) FILTER (k <= 20) AS t_recent, median(turnover_eur) FILTER (k BETWEEN 21 AND 80) AS t_before
+                FROM d GROUP BY isin""", [e["idx"]])
+    changes = {r["isin"]: (_change(r["x_recent"], r["x_before"]), _change(r["t_recent"], r["t_before"])) for r in rows}
+    idx_med = []
+    for i in (0, 1):
+        vals = [c[i] for c in changes.values() if c[i] is not None]
+        idx_med.append(median(vals) if vals else None)
+    me = next((r for r in rows if r["isin"] == isin), None)
+    s, t = changes.get(isin, (None, None))
+    state = pulse_state(s, t)
+    if me is None or state is None:
+        return {"isin": isin, "status": "not_found", "reason": "no spread data in the last 80 trading days", "rule": PULSE_RULE}
+
+    measures = (("xlm_bps", f"Spread, EUR {order:,} order", "bp", s, idx_med[0], me["x_recent"], me["x_before"], True, "XLM"),
+                ("turnover_eur", "Median daily turnover", "EUR", t, idx_med[1], me["t_recent"], me["t_before"], False, "XETRA_OHLC"))
+    metrics, moves = [], []
+    for key, label, unit, chg, med, recent, before, lower, source in measures:
+        d = pulse_direction(chg, lower)
+        if d:
+            moves.append((chg, med))
+        metrics.append({"key": key, "label": label, "unit": unit, "value": scaled(recent, 1), "baseline": scaled(before, 1),
+                        "change_pct": _pct(chg), "index_median_change_pct": _pct(med), "source": source,
+                        "direction": {1: "better", -1: "worse", 0: "steady", None: None}[d],
+                        "context": pulse_context([(chg, med)]) if d else None})
+    context = pulse_context(moves) if state != "steady" else None
+    gap = round(abs(s + t) * 100) if state == "mixed" else None  # spread improvement (-s) vs turnover change (t), in points
+
+    sign = lambda v: f"{v * 100:+.1f}%"  # one decimal: -9.6 % must not read as -10 %, the threshold
+    text = (f"Liquidity Pulse for {e['name']}: {PULSE_HEAD[state]}. Over the last 20 trading days to {iso(me['last'])}, the spread "
+            f"for a EUR {order:,} order was {me['x_recent']:.1f} bp against {me['x_before']:.1f} bp in the 60 trading days before "
+            f"({sign(s)})" + (f", and median daily turnover changed by {sign(t)}." if t is not None else "; turnover: no data."))
+    if gap is not None:
+        text += f" The two measures point in opposite directions, {gap} percentage points apart."
+    if idx_med[0] is not None:
+        text += f" {e['idx']} median: spread {sign(idx_med[0])}" + (f", turnover {sign(idx_med[1])}" if idx_med[1] is not None else "")
+        text += f", so the change is {context}." if context else "."
+    return {"isin": isin, "status": "found", "state": state, "label": PULSE_HEAD[state], "context": context, "gap_pp": gap,
+            "index": e["idx"], "index_members": sum(c[0] is not None for c in changes.values()), "date": iso(me["last"]),
+            "window": f"median {iso(me['first']) or 'start of data'} to {iso(me['last'])}: last 20 trading days vs the 60 before",
+            "metrics": metrics, "text": text, "rule": PULSE_RULE, "source": "XLM, XETRA_OHLC"}
+
+
 @app.get("/companies/{isin}/peers")
 def peers(isin: str, basis: str = "index", metric: str = "xlm_bps", start: str | None = None, end: str | None = None):
     """Median of the metric over the period for the stock and its peer group; rank 1 = lowest value."""
@@ -442,7 +540,10 @@ def ask(isin: str, question: str, day: str | None = None):
                 f"The median spread for a EUR 25,000 order was {x['value']:.1f} bp, {word(x['value'], x['baseline'])} the "
                 f"{x['baseline']:.1f} bp before (source: {x['source']}). The auction share of turnover was {au['value']:.1f}%, "
                 f"{word(au['value'], au['baseline'])} the {au['baseline']:.1f}% before (source: {au['source']}).")
-        return {"intent": intent, "text": text, "facts": facts, "links": [{"label": "Overview charts", "to": f"/c/{isin}"}]}
+        p = pulse(isin)
+        if p["status"] == "found":  # the headline answer; the same function feeds the dashboard tile, so the two never differ
+            text = f"{p['text']} {text}"
+        return {"intent": intent, "text": text, "facts": facts, "pulse": p, "links": [{"label": "Overview charts", "to": f"/c/{isin}"}]}
     if intent == "spread_peers":
         groups = [peers(isin, basis=b, metric="xlm_bps") for b in ("index", "sector", "size")]
         parts = [f"rank {g['rank']} of {g['of']} in {g['group']} (group median {g['median']:.1f} bp)" for g in groups]

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  getCases, getCompanies, getImpactDay, getImpactEvent, getSeries, getTrend,
-  type Case, type Cases, type Company, type Fact, type Impact, type Series,
+  getCases, getCompanies, getImpactDay, getImpactEvent, getPulse, getSeries, getTrend,
+  type Case, type Cases, type Company, type Fact, type Impact, type Pulse, type Series,
 } from './api';
+import LiquidityPulse from './components/LiquidityPulse';
 import StockSelector from './components/StockSelector';
 import PriceChart, { type DayInfo } from './components/PriceChart';
 import MetricChart from './components/MetricChart';
@@ -35,6 +36,7 @@ export default function App() {
   const turnover = useFetch<Series>(isin && `${isin}|turnover`, () => getSeries(isin!, 'turnover_eur')).data;
   const cases = useFetch<Cases>(isin && `${isin}|cases`, () => getCases(isin!)).data;
   const trend = useFetch<Fact[]>(isin && `${isin}|trend`, () => getTrend(isin!)).data ?? [];
+  const pulse = useFetch<Pulse>(isin && `${isin}|pulse`, () => getPulse(isin!)).data ?? null;
   const metricSeries = useFetch<Series>(isin && `${isin}|${metric}|${orderSize}`, () =>
     getSeries(isin!, metric, metric === 'xlm_bps' ? orderSize : undefined),
   ).data;
@@ -256,6 +258,7 @@ export default function App() {
           {navItems.map(({ key, label }) => <button key={key} className={activeView === key ? 'on' : ''} aria-current={activeView === key ? 'page' : undefined} disabled={!company} onClick={() => navigate(key)}>{label}</button>)}
           {(impact || impactLoading || impactError) && <button className={activeView === 'impact' ? 'on' : ''} aria-current={activeView === 'impact' ? 'page' : undefined} onClick={() => { setCompare(null); setTiming(null); }}>Day analysis</button>}
         </nav>
+        <LiquidityPulse pulse={pulse} />
         <section className="trend-strip" aria-label="Recent trading profile">
           {trend.map((f) => (
             <div className="trend" key={f.key} title={f.window}>
@@ -328,7 +331,7 @@ export default function App() {
       </div>
 
       {reportOpen && company && (
-        <ReportView company={company} trend={trend} cases={cases} impact={impact} onClose={() => setReportOpen(false)} />
+        <ReportView company={company} trend={trend} pulse={pulse} cases={cases} impact={impact} onClose={() => setReportOpen(false)} />
       )}
     </div>
   );

@@ -64,6 +64,30 @@ select, .selector-search { background: white; border: 1px solid #b9c3d3; border-
 .selector-item:hover { background: var(--bg); }
 .selector-item.active { background: var(--accent-soft); }
 
+/* Liquidity Pulse: one word on trading cost, above the key figures. */
+.pulse { --pulse: var(--muted); background: var(--panel); border-left: 5px solid var(--pulse); padding: 16px 24px; margin-bottom: 16px; }
+.pulse-stronger { --pulse: var(--up); }
+.pulse-weaker { --pulse: var(--down); }
+.pulse-mixed { --pulse: var(--unmatched); }
+.pulse-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+.pulse-name { color: var(--heading); font-size: 14px; font-weight: 600; }
+.pulse-state { color: var(--pulse); font-size: 29px; font-weight: 700; line-height: 1.2; cursor: help; }
+.pulse-none .pulse-state { font-size: 15px; cursor: default; }
+.pulse-chip { border: 1px solid var(--pulse); color: var(--pulse); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; }
+.pulse-rule { margin-left: auto; font-size: 12px; color: var(--muted); max-width: 520px; }
+.pulse-rule summary { cursor: pointer; text-align: right; }
+.pulse-rule p { margin: 6px 0 0; line-height: 1.5; }
+.pulse-measures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 10px 0 4px; }
+.pulse-change { font-size: 21px; font-weight: 700; color: var(--heading); font-variant-numeric: tabular-nums; }
+.pulse-measure.better .pulse-change { color: var(--up); }
+.pulse-measure.worse .pulse-change { color: var(--down); }
+@media (max-width: 700px) {
+  .pulse { padding: 14px 16px; }
+  .pulse-measures { grid-template-columns: 1fr; }
+  .pulse-rule { margin-left: 0; }
+  .pulse-rule summary { text-align: left; }
+}
+
 /* Key figures. */
 .trend-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
 .trend { background: var(--panel); padding: 18px 24px; }
