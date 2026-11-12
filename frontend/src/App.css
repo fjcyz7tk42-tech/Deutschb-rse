@@ -1,8 +1,6 @@
 /* Layout: a light exchange workspace, with an independent product identity. */
 .app { min-height: 100vh; }
 .page-width { width: min(1480px, calc(100% - 64px)); margin-inline: auto; }
-.utility-bar { background: var(--blue); color: white; font-size: 12px; }
-.utility-inner { display: flex; justify-content: space-between; gap: 16px; padding-block: 7px; }
 .app-header { display: flex; align-items: center; gap: 40px; min-height: 104px; padding-block: 22px; }
 .brand { display: flex; flex-direction: column; color: var(--heading); text-decoration: none; font-size: 29px; font-weight: 700; line-height: 1.15; letter-spacing: -.8px; }
 .brand span { margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: .1px; }
@@ -341,8 +339,6 @@ select, .selector-search { background: white; border: 1px solid #b9c3d3; border-
 }
 @media (max-width: 600px) {
   .page-width { width: calc(100% - 28px); }
-  .utility-inner { font-size: 10px; gap: 10px; }
-  .utility-inner span:last-child { text-align: right; }
   .app-header { min-height: 0; padding-block: 18px; gap: 18px 12px; }
   .brand { font-size: 26px; }
   .brand span { font-size: 10px; }
@@ -403,7 +399,7 @@ select, .selector-search { background: white; border: 1px solid #b9c3d3; border-
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
 @media print {
-  body:has(.report-overlay) .utility-bar, body:has(.report-overlay) .app-header, body:has(.report-overlay) .workspace, .no-print { display: none !important; }
+  body:has(.report-overlay) .app-header, body:has(.report-overlay) .workspace, .no-print { display: none !important; }
   .report-overlay { position: static; padding: 0; background: none; overflow: visible; }
   .report { max-width: none; width: 100%; padding: 0; font-size: 10pt; }
   .report h2 { break-after: avoid; }

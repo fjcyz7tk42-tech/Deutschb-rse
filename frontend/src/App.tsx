@@ -233,9 +233,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="utility-bar">
-        <div className="page-width utility-inner"><span>Issuer intelligence · Xetra</span><span>{latest ? `Trading data through ${fmtDate(latest.date)}` : 'Loading trading data…'}</span></div>
-      </div>
       <header className="app-header page-width">
         <a className="brand" href="#" onClick={(e) => { e.preventDefault(); navigate('overview'); }}>IssuerLens<span>Issuer Intelligence Hub</span></a>
         <StockSelector companies={companies} selected={company} onSelect={selectCompany} />
