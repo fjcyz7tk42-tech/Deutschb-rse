@@ -245,7 +245,8 @@ export default function PriceChart({ price, turnover, cases, selectedDate, range
           ? `Unusual ${d.c.metrics.join(', ').replace(/_/g, ' ')} · ${STATUS_LABELS[d.c.status]}`
           : 'Company event';
         tip.innerHTML = `<div class="tip-date">${fmtDate(d.c.peak_date)}</div><div class="tip-head">${escapeHtml(head)}</div><div>${escapeHtml(title)}</div>${
-          d.c.market_event ? `<div class="tip-market">Market: ${escapeHtml(d.c.market_event.label)}</div>` : ''
+          (d.c.market_event ? `<div class="tip-market">Market: ${escapeHtml(d.c.market_event.label)}</div>` : '') +
+          (d.c.sector_event && !d.c.event ? `<div class="tip-market">Sector: ${escapeHtml(d.c.sector_event.label)}</div>` : '')
         }${d.entries.length > 1 ? `<div class="tip-head">${d.entries.length} entries on this day · click to choose</div>` : ''}`;
         tip.style.display = 'block';
         const left = M.left + d.cx + (d.cx > w / 2 ? -270 : 12);
@@ -280,6 +281,7 @@ export default function PriceChart({ price, turnover, cases, selectedDate, range
       <div className="chart-legend">
         <span><i className="dot" style={{ background: 'var(--matched)' }} />Unusual day, event nearby</span>
         <span><i className="dot" style={{ background: 'var(--market)' }} />Market-wide day</span>
+        <span><i className="dot" style={{ background: 'var(--sector)' }} />Sector-wide day</span>
         <span><i className="dot" style={{ background: 'var(--unmatched)' }} />No event found</span>
         <span><i className="dot ring" />Company event</span>
         <span><i className="bar" />Unusual turnover</span>

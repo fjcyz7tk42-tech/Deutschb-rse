@@ -80,6 +80,7 @@ export default function ReportView({ company, trend, cases, impact, onClose }: P
                 </>
               ) : 'No company event found on this day.'}
               {impact.market_event ? ` Market-wide: ${impact.market_event.label}.` : ''}
+              {impact.sector_event ? ` Sector-wide: ${impact.sector_event.label}.` : ''}
             </p>
             {impact.text && <p className="r-text">{summaryText(impact.text, impact.event)}</p>}
             <FactTable facts={impact.facts} />
@@ -114,7 +115,8 @@ export default function ReportView({ company, trend, cases, impact, onClose }: P
           <section>
             <h2>Unusual days in 2026</h2>
             <p>
-              {cases.counts.matched} with a company event nearby ({MATCH_WINDOW_TEXT}), {cases.counts.market_day} on market-wide days,
+              {cases.counts.matched} with a company event nearby ({MATCH_WINDOW_TEXT}), {cases.counts.market_day} on market-wide days
+              (index-wide or a named market event), {cases.counts.sector_day ?? 0} on sector-wide days,
               {' '}{cases.counts.unmatched} without an event found.
             </p>
             <table className="r-table">
@@ -125,7 +127,7 @@ export default function ReportView({ company, trend, cases, impact, onClose }: P
                     <td>{fmtDate(c.peak_date)}</td>
                     <td>{c.metrics.map((m) => m.replace(/_/g, ' ')).join(', ')}</td>
                     <td>{STATUS_LABELS[c.status]}</td>
-                    <td>{c.event ? `${eventTypeLabel(c.event.type)}: ${eventTitle(c.event)}` : c.market_event?.label ?? '–'}</td>
+                    <td>{c.event ? `${eventTypeLabel(c.event.type)}: ${eventTitle(c.event)}` : c.market_event?.label ?? c.sector_event?.label ?? '–'}</td>
                   </tr>
                 ))}
               </tbody>

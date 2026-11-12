@@ -414,3 +414,4 @@ select, .selector-search { background: white; border: 1px solid #b9c3d3; border-
   .app { min-height: 0; }
   @page { margin: 16mm; }
 }
+.market-box.sector { color: var(--sector); }

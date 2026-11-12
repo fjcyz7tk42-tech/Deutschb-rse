@@ -109,6 +109,11 @@ export default function ImpactCard({ data, loading, error, ticker, onClose, onCo
               On the same day, market-wide: {data.market_event.url ? <a href={data.market_event.url} target="_blank" rel="noreferrer">{data.market_event.label} ↗</a> : data.market_event.label}
             </div>
           )}
+          {data.sector_event && (
+            <div className="market-box sector">
+              On the same day, sector-wide: {data.sector_event.label} <span className="muted">({data.sector_event.source})</span>
+            </div>
+          )}
 
           <div className="hero-grid">{hero.map((f) => <FactTile key={f.key} f={f} hero />)}</div>
 

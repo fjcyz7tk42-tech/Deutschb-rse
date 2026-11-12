@@ -29,7 +29,7 @@ export default function CasesPanel({ data, selectedDate, onOpen }: Props) {
       </div>
       {data && (
         <div className="count-line">
-          {(['matched', 'market_day', 'unmatched'] as Status[]).map((s) => (
+          {(['matched', 'market_day', 'sector_day', 'unmatched'] as Status[]).map((s) => (
             <button key={s} className={`count ${filter === s ? 'on' : ''}`} onClick={() => setFilter(filter === s ? 'all' : s)}>
               <i className="dot" style={{ background: STATUS_COLORS[s] }} />
               <b>{data.counts[s]}</b> {STATUS_LABELS[s].toLowerCase()}
@@ -59,6 +59,7 @@ export default function CasesPanel({ data, selectedDate, onOpen }: Props) {
                 {c.kind === 'episode' && c.event && ' · '}
                 {c.event && eventTypeLabel(c.event.type)}
                 {c.market_event && <> · market: {c.market_event.label}</>}
+                {c.sector_event && c.kind === 'episode' && !c.event && <> · sector: {c.sector_event.label}</>}
                 {c.start !== c.end && <> · {fmtDate(c.start, false)}–{fmtDate(c.end, false)}</>}
               </span>
             </span>

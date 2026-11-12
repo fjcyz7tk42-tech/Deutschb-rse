@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const http = axios.create({ baseURL: '/api' });
 
-export type Status = 'matched' | 'market_day' | 'unmatched';
+export type Status = 'matched' | 'market_day' | 'sector_day' | 'unmatched';
 
 export interface Company {
   isin: string;
@@ -63,6 +63,16 @@ export interface MarketEvent {
   url: string | null;
 }
 
+/** The stock's sector was unusual as a whole that day (computed from Xetra data, not a published event). */
+export interface SectorEvent {
+  label: string;
+  source: string;
+  url: string | null;
+  sector: string;
+  anomalous: number;
+  members: number;
+}
+
 export interface Case {
   id: string;
   kind: 'episode' | 'event';
@@ -74,6 +84,7 @@ export interface Case {
   status: Status;
   event: HubEvent | null;
   market_event: MarketEvent | null;
+  sector_event?: SectorEvent | null;
 }
 
 export interface Cases {
@@ -111,6 +122,7 @@ export interface Impact {
   status: Status | null;
   event: HubEvent | null;
   market_event: MarketEvent | null;
+  sector_event?: SectorEvent | null;
   facts: Fact[];
   intraday: { time: string; turnover: number; price: number | null; buy_share: number | null }[];
   similar: SimilarGroup | null;

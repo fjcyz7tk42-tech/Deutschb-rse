@@ -56,6 +56,8 @@ export const SOURCE_LABELS: Record<string, string> = {
   index_constituents: 'Index constituents',
   manual_csv: 'Company IR website',
   eqs: 'EQS News',
+  eqs_agm: 'EQS News (AGM notice)',
+  bundesanzeiger: 'Bundesanzeiger (net short positions)',
   calendars: 'Public calendar',
   short_positions: 'Bundesanzeiger short positions',
   tagesschau: 'tagesschau.de (business news)',
@@ -98,12 +100,14 @@ export const TIMING_METRICS: { key: string; label: string; short: string; note?:
 export const STATUS_LABELS: Record<Status, string> = {
   matched: 'Event nearby',
   market_day: 'Market-wide day',
+  sector_day: 'Sector-wide day',
   unmatched: 'No event found',
 };
 
 export const STATUS_COLORS: Record<Status, string> = {
   matched: 'var(--matched)',
   market_day: 'var(--market)',
+  sector_day: 'var(--sector)',
   unmatched: 'var(--unmatched)',
 };
 
